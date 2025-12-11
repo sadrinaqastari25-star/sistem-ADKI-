@@ -22,10 +22,13 @@ const MasterData: React.FC<MasterDataProps> = ({
   // Contact Form State
   const [contactForm, setContactForm] = useState({ name: '', role: 'CUSTOMER' as const, phone: '' });
 
+  // Safe ID generation
+  const generateId = () => Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+
   const handleProductSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onAddProduct({
-      id: crypto.randomUUID(),
+      id: generateId(),
       name: prodForm.name,
       category: prodForm.category,
       stock: parseInt(prodForm.stock) || 0,
@@ -39,7 +42,7 @@ const MasterData: React.FC<MasterDataProps> = ({
   const handleContactSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onAddContact({
-      id: crypto.randomUUID(),
+      id: generateId(),
       name: contactForm.name,
       role: contactForm.role,
       phone: contactForm.phone

@@ -16,25 +16,44 @@ const App: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [riskAssessment, setRiskAssessment] = useState<RiskAssessment | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   // Load data from local storage on mount (Simulation)
   useEffect(() => {
-    const savedTrans = localStorage.getItem('adki_transactions');
-    const savedProds = localStorage.getItem('adki_products');
-    const savedContacts = localStorage.getItem('adki_contacts');
-    const savedRisk = localStorage.getItem('adki_risk');
-    
-    if (savedTrans) setTransactions(JSON.parse(savedTrans));
-    if (savedProds) setProducts(JSON.parse(savedProds));
-    if (savedContacts) setContacts(JSON.parse(savedContacts));
-    if (savedRisk) setRiskAssessment(JSON.parse(savedRisk));
+    try {
+      const savedTrans = localStorage.getItem('adki_transactions');
+      const savedProds = localStorage.getItem('adki_products');
+      const savedContacts = localStorage.getItem('adki_contacts');
+      const savedRisk = localStorage.getItem('adki_risk');
+      
+      if (savedTrans) setTransactions(JSON.parse(savedTrans));
+      if (savedProds) setProducts(JSON.parse(savedProds));
+      if (savedContacts) setContacts(JSON.parse(savedContacts));
+      if (savedRisk) setRiskAssessment(JSON.parse(savedRisk));
+    } catch (error) {
+      console.error("Failed to load data from local storage", error);
+      // Fallback: Clear potentially corrupted data or just start empty
+    } finally {
+      setIsLoaded(true);
+    }
   }, []);
 
   // Save data on change
-  useEffect(() => { localStorage.setItem('adki_transactions', JSON.stringify(transactions)); }, [transactions]);
-  useEffect(() => { localStorage.setItem('adki_products', JSON.stringify(products)); }, [products]);
-  useEffect(() => { localStorage.setItem('adki_contacts', JSON.stringify(contacts)); }, [contacts]);
-  useEffect(() => { if (riskAssessment) localStorage.setItem('adki_risk', JSON.stringify(riskAssessment)); }, [riskAssessment]);
+  useEffect(() => { 
+    if (isLoaded) localStorage.setItem('adki_transactions', JSON.stringify(transactions)); 
+  }, [transactions, isLoaded]);
+  
+  useEffect(() => { 
+    if (isLoaded) localStorage.setItem('adki_products', JSON.stringify(products)); 
+  }, [products, isLoaded]);
+  
+  useEffect(() => { 
+    if (isLoaded) localStorage.setItem('adki_contacts', JSON.stringify(contacts)); 
+  }, [contacts, isLoaded]);
+  
+  useEffect(() => { 
+    if (isLoaded && riskAssessment) localStorage.setItem('adki_risk', JSON.stringify(riskAssessment)); 
+  }, [riskAssessment, isLoaded]);
 
   const handleAddTransaction = (t: Transaction) => {
     setTransactions([t, ...transactions]);
@@ -97,6 +116,8 @@ const App: React.FC = () => {
     </button>
   );
 
+  if (!isLoaded) return <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-500">Memuat data...</div>;
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row font-sans text-slate-900">
       
@@ -121,7 +142,7 @@ const App: React.FC = () => {
           </div>
           <div>
             <h1 className="text-xl font-bold tracking-wide">ADKI</h1>
-            <p className="text-xs text-slate-400">Asisten Akuntansi Digital</p>
+            <p className="text-xs text-slate-400">Integrator Bisnis UMKM</p>
           </div>
         </div>
 

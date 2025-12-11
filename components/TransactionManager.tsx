@@ -71,12 +71,21 @@ const TransactionManager: React.FC<TransactionManagerProps> = ({
 
     const selectedContact = contacts.find(c => c.id === formData.contactId);
     const selectedProduct = products.find(p => p.id === formData.productId);
+    const amountValue = parseFloat(formData.amount);
+
+    if (isNaN(amountValue)) {
+        alert("Mohon masukkan nominal yang valid");
+        return;
+    }
+
+    // Safer ID generation
+    const generateId = () => Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
 
     const newTransaction: Transaction = {
-      id: crypto.randomUUID(),
+      id: generateId(),
       date: new Date().toISOString(),
       description: formData.description,
-      amount: parseFloat(formData.amount),
+      amount: amountValue,
       type: formData.type,
       category: formData.category,
       user: 'Pemilik',
